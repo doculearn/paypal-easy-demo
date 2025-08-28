@@ -20,7 +20,7 @@ def get_paypal_client():
     return PayPalEasyClient(
         client_id=settings.PAYPAL_CLIENT_ID,
         client_secret=settings.PAYPAL_CLIENT_SECRET,
-        environment=env
+        environment="sandbox" if settings.PAYPAL_SANDBOX else "production"
     )
 
 class HealthCheckAPIView(APIView):

@@ -1,6 +1,8 @@
 # paypal_easy_demo/settings.py
 import os
 from pathlib import Path
+from decouple import config
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -58,9 +60,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 # PayPal Configuration
-PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID', 'demo_client_id')
-PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET', 'demo_client_secret')
-PAYPAL_SANDBOX = os.getenv('PAYPAL_SANDBOX', 'True').lower() == 'true'
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='your_sandbox_client_id_here')
+PAYPAL_CLIENT_SECRET = config('PAYPAL_CLIENT_SECRET', default='your_sandbox_client_secret_here')
+PAYPAL_SANDBOX = config('PAYPAL_SANDBOX', default=True, cast=bool)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
