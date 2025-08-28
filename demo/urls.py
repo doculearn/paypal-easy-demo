@@ -12,6 +12,7 @@ urlpatterns = [
     path('payments/<int:id>/', views.PaymentDetailAPIView.as_view(), name='payment_detail'),
     path('payments/<int:payment_id>/capture/', views.CapturePaymentAPIView.as_view(), name='capture_payment'),
     path('payments/stats/', views.PaymentStatsAPIView.as_view(), name='payment_stats'),
+    path('payments/<int:payment_id>/success/', views.PaymentSuccessView.as_view(), name='payment_success'),
     
     # PayPal webhook
     path('paypal/webhook/', views.PayPalWebhookAPIView.as_view(), name='paypal_webhook'),
