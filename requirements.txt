@@ -3,3 +3,4 @@ djangorestframework
 django-cors-headers
 paypal-easy
 python-dotenv
+python-decouple
