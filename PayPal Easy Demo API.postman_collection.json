@@ -1,0 +1,572 @@
+{
+	"info": {
+		"_postman_id": "b6a5722c-f0da-41d2-a1b8-a717369db500",
+		"name": "PayPal Easy Demo API",
+		"description": "Complete test collection for PayPal Easy Django Demo API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46878121",
+		"_collection_link": "https://williammabotja.postman.co/workspace/William-Mabotja's-Workspace~634022c0-ae9e-4ceb-86ee-370b405a0d60/collection/46878121-b6a5722c-f0da-41d2-a1b8-a717369db500?action=share&source=collection_link&creator=46878121"
+	},
+	"item": [
+		{
+			"name": "1. Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has status field', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"    pm.expect(jsonData.status).to.eql('healthy');",
+							"});",
+							"",
+							"pm.test('PayPal configuration present', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('paypal_sandbox');",
+							"    pm.expect(jsonData).to.have.property('paypal_configured');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/health/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"health",
+						""
+					]
+				},
+				"description": "Check if API is running and PayPal is configured"
+			},
+			"response": []
+		},
+		{
+			"name": "2. Create Payment - Basic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201', function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test('Payment created successfully', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('success');",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"    pm.expect(jsonData).to.have.property('payment_id');",
+							"    pm.expect(jsonData).to.have.property('paypal_order_id');",
+							"    pm.expect(jsonData).to.have.property('approval_url');",
+							"    ",
+							"    // Save for subsequent requests",
+							"    pm.collectionVariables.set('payment_id', jsonData.payment_id);",
+							"    pm.collectionVariables.set('paypal_order_id', jsonData.paypal_order_id);",
+							"});",
+							"",
+							"pm.test('Response contains expected fields', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.amount).to.eql('29.99');",
+							"    pm.expect(jsonData.currency).to.eql('USD');",
+							"    pm.expect(jsonData.description).to.eql('PayPal Easy Demo Payment');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 29.99,\n    \"description\": \"PayPal Easy Demo Payment\",\n    \"currency\": \"USD\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/payments/create/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"payments",
+						"create",
+						""
+					]
+				},
+				"description": "Create a basic PayPal payment"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Create Payment - With Custom URLs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201', function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test('Premium payment created', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"    pm.expect(jsonData.amount).to.eql('99.99');",
+							"    pm.expect(jsonData.description).to.include('Premium');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 99.99,\n    \"description\": \"Premium subscription payment\",\n    \"currency\": \"USD\",\n    \"return_url\": \"https://example.com/success\",\n    \"cancel_url\": \"https://example.com/cancel\",\n    \"brand_name\": \"PayPal Easy Demo Store\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/payments/create/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"payments",
+						"create",
+						""
+					]
+				},
+				"description": "Create payment with custom return URLs and branding"
+			},
+			"response": []
+		},
+		{
+			"name": "4. Create Payment - Invalid Amount",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test('Validation error returned', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('errors');",
+							"    pm.expect(jsonData.errors).to.have.property('amount');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": -10.00,\n    \"description\": \"Invalid payment test\",\n    \"currency\": \"USD\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/payments/create/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"payments",
+						"create",
+						""
+					]
+				},
+				"description": "Test validation with invalid amount"
+			},
+			"response": []
+		},
+		{
+			"name": "5. Get Payment Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Payment details returned', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData).to.have.property('amount');",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"    pm.expect(jsonData).to.have.property('paypal_order_id');",
+							"});",
+							"",
+							"pm.test('PayPal status included', function () {",
+							"    const jsonData = pm.response.json();",
+							"    // May have PayPal status fields if order exists",
+							"    if (jsonData.paypal_order_id) {",
+							"        console.log('PayPal Order ID:', jsonData.paypal_order_id);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/payments/{{payment_id}}/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"payments",
+						"{{payment_id}}",
+						""
+					]
+				},
+				"description": "Get payment details including PayPal status"
+			},
+			"response": []
+		},
+		{
+			"name": "6. List All Payments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Payments list returned', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('results');",
+							"    pm.expect(jsonData.results).to.be.an('array');",
+							"});",
+							"",
+							"pm.test('Pagination info present', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('count');",
+							"    pm.expect(jsonData).to.have.property('next');",
+							"    pm.expect(jsonData).to.have.property('previous');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/payments/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"payments",
+						""
+					]
+				},
+				"description": "Get list of all payments"
+			},
+			"response": []
+		},
+		{
+			"name": "7. Filter Payments by Status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Only pending payments returned', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.results).to.be.an('array');",
+							"    jsonData.results.forEach(payment => {",
+							"        pm.expect(payment.status).to.eql('pending');",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/payments/?status=pending",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"payments",
+						""
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "pending"
+						}
+					]
+				},
+				"description": "Filter payments by status"
+			},
+			"response": []
+		},
+		{
+			"name": "8. Capture Payment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response received', function () {",
+							"    pm.response.to.be.ok;",
+							"});",
+							"",
+							"// In demo mode, this may return an error since payment wasn't actually approved",
+							"pm.test('Capture response handled', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('success');",
+							"    if (jsonData.success) {",
+							"        pm.expect(jsonData).to.have.property('payment_id');",
+							"        console.log('Payment captured successfully');",
+							"    } else {",
+							"        pm.expect(jsonData).to.have.property('error');",
+							"        console.log('Capture failed (expected in demo):', jsonData.error);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/payments/{{payment_id}}/capture/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"payments",
+						"{{payment_id}}",
+						"capture",
+						""
+					]
+				},
+				"description": "Attempt to capture the payment (will fail in demo without real approval)"
+			},
+			"response": []
+		},
+		{
+			"name": "9. Payment Statistics",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Statistics returned', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('total_payments');",
+							"    pm.expect(jsonData).to.have.property('completed_payments');",
+							"    pm.expect(jsonData).to.have.property('pending_payments');",
+							"    pm.expect(jsonData).to.have.property('failed_payments');",
+							"    pm.expect(jsonData).to.have.property('cancelled_payments');",
+							"    pm.expect(jsonData).to.have.property('total_completed_amount');",
+							"});",
+							"",
+							"pm.test('Statistics are numbers', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.total_payments).to.be.a('number');",
+							"    pm.expect(jsonData.completed_payments).to.be.a('number');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/payments/stats/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"payments",
+						"stats",
+						""
+					]
+				},
+				"description": "Get payment statistics and totals"
+			},
+			"response": []
+		},
+		{
+			"name": "10. PayPal Webhook Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Webhook processed', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"    pm.expect(jsonData.status).to.eql('webhook processed');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"event_type\": \"CHECKOUT.ORDER.APPROVED\",\n    \"resource\": {\n        \"id\": \"{{paypal_order_id}}\"\n    }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/paypal/webhook/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"paypal",
+						"webhook",
+						""
+					]
+				},
+				"description": "Test webhook endpoint with simulated PayPal notification"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"exec": [
+					"// Set timestamp for unique descriptions",
+					"pm.globals.set('timestamp', Date.now());"
+				],
+				"type": "text/javascript"
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "payment_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "paypal_order_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
