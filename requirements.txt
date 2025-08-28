@@ -1,0 +1,5 @@
+django
+djangorestframework
+django-cors-headers
+paypal-easy
+python-dotenv
