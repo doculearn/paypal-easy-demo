@@ -302,3 +302,27 @@ class PaymentStatsAPIView(APIView):
                 {'error': str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class PaymentSuccessView(APIView):
+    """Handle PayPal payment success redirect"""
+    permission_classes = [AllowAny]
+    
+    def get(self, request, payment_id):
+        token = request.GET.get('token')
+        payer_id = request.GET.get('PayerID')
+
+        try:
+            payment = PaymentDemo.objects.get(id=payment_id)
+            # You can add additional logic here to update the payment status or perform other actions
+            return Response({
+                'success': True,
+                'payment_id': payment_id,
+                'token': token,
+                'payer_id': payer_id,
+                'message': 'Payment successful'
+            })
+        except PaymentDemo.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'Payment not found'
+            }, status=404)
