@@ -4,7 +4,7 @@ A Django REST API demonstrating the capabilities of the [paypal-easy](https://py
 
 ## [See it in Action](https://youtu.be/EMO9o9O4Fh4?si=5kgIg6Rlbwljzs_W)
 
-### [Get the Postman Collection]([https://github.com/doculearn/paypal-easy-demo/blob/main/PayPal%20Easy%20Demo%20API.postman_collection.json])
+### [Get the Postman Collection](https://github.com/doculearn/paypal-easy-demo/blob/main/PayPal%20Easy%20Demo%20API.postman_collection.json)
 
 ## Overview
 
