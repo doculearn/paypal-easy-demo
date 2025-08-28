@@ -4,6 +4,8 @@ A Django REST API demonstrating the capabilities of the [paypal-easy](https://py
 
 ## [See it in Action](https://youtu.be/EMO9o9O4Fh4?si=5kgIg6Rlbwljzs_W)
 
+### [Download the Postman Collection](https://williammabotja.postman.co/workspace/William-Mabotja's-Workspace~634022c0-ae9e-4ceb-86ee-370b405a0d60/collection/46878121-b6a5722c-f0da-41d2-a1b8-a717369db500?action=share&source=copy-link&creator=46878121)
+
 ## Overview
 
 This demo showcases how paypal-easy transforms PayPal integration from complex, verbose code into simple, readable API calls. Instead of wrestling with 15+ lines of boilerplate and confusing imports, create payments with just a few lines.
